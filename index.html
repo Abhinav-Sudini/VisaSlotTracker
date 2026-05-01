@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Data & Log Viewer</title>
+</head>
+<body>
+    <div>
+        <h3>Notification triggers</h3>
+        <textarea id="nInfoBox" rows="5" cols="140" readonly>Loading Info...</textarea>
+    </div>
+
+    <hr>
+
+    <div>
+        <label for="dateSelect">Date:</label>
+        <input type="date" id="dateSelect">
+
+        <label for="locationSelect">Location:</label>
+        <select id="locationSelect">
+            <option value="">--Select--</option>
+            <option value="HYDERABAD">Hyderabad</option>
+            <option value="HYDERABAD_VAC">Hyderabad VAC</option>
+            <option value="CHENNAI">CHENNAI</option>
+            <option value="CHENNAI_VAC">CHENNAI VAC</option>
+            <option value="NEW_DELHI">NEW_DELHI</option>
+            <option value="NEW_DELHI_VAC">NEW_DELHI VAC</option>
+            <option value="MUMBAI">MUMBAI</option>
+            <option value="MUMBAI_VAC">MUMBAI VAC</option>
+            <option value="KOLKATA">KOLKATA</option>
+            <option value="KOLKATA_VAC">KOLKATA VAC</option>
+        </select>
+    </div>
+
+    <hr>
+
+    <div id="imageList">
+        <!-- Images will be injected here -->
+    </div>
+
+    <hr>
+
+    <div>
+        <h3>System Logs</h3>
+        <textarea id="logBox" rows="15" cols="140" readonly>Loading logs...</textarea>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:8000'; 
+
+        const dateSelect = document.getElementById('dateSelect');
+        const locationSelect = document.getElementById('locationSelect');
+        const imageList = document.getElementById('imageList');
+        const logBox = document.getElementById('logBox');
+        const nInfoBox = document.getElementById('nInfoBox');
+
+        // 1. Function to handle image fetching
+        async function fetchAndDisplayImages() {
+            const date = dateSelect.value;
+            const location = locationSelect.value;
+
+            if (!date || !location) return;
+
+            imageList.innerHTML = '<p>Loading data...</p>';
+
+            try {
+                const infoReq = await fetch(`${BASE_URL}/api/info/${date}/${location}/`);
+                if (!infoReq.ok) throw new Error(`API Error: ${infoReq.status}`);
+                
+                const files = await infoReq.json();
+                imageList.innerHTML = ''; 
+
+                if (files.length === 0) {
+                    imageList.innerHTML = '<p>No images found for this date/location.</p>';
+                    return;
+                }
+
+                files.forEach(fileName => {
+                    // Extract time parts
+                    const [hh, mm, ss] = fileName.replace('.png', '').split('-');
+                    
+                    // Create Date object assuming the original filename timestamp is in IST (+05:30)
+                    // (Change '+05:30' to 'Z' if your server saves files in UTC)
+                    const isoDateString = `${date}T${hh}:${mm}:${ss}Z`;
+                    const imageDate = new Date(isoDateString);
+
+                    // Format times for IST and Seattle
+                    const timeOpts = { hour: '2-digit', minute: '2-digit', hour12: true };
+                    const istTime = imageDate.toLocaleTimeString('en-US', { ...timeOpts, timeZone: 'Asia/Kolkata' });
+                    const seattleTime = imageDate.toLocaleTimeString('en-US', { ...timeOpts, timeZone: 'America/Los_Angeles' });
+                    
+                    const imgUrl = `${BASE_URL}/fs/${date}/${location}/${fileName}/`;
+
+                    const container = document.createElement('div');
+                    container.innerHTML = `
+                        <p>
+                          <strong>Time (India):</strong> ${istTime} | <strong>Time (Seattle):</strong> ${seattleTime} 
+                          <strong> //// Date:</strong> ${date}
+                        </p>
+                        <img src="${imgUrl}" alt="Image from ${istTime}" style="max-width: 400px; display: block; margin-bottom: 20px;">
+                    `;
+                    
+                    imageList.appendChild(container);
+                });
+
+            } catch (error) {
+                console.error("Error fetching images:", error);
+                imageList.innerHTML = `<p style="color: red;">Failed to load images. Check console.</p>`;
+            }
+        }
+
+        // 2. Function to fetch logs
+        async function fetchLogs() {
+            try {
+                const logReq = await fetch(`${BASE_URL}/logs`);
+                if (!logReq.ok) throw new Error(`Log Error: ${logReq.status}`);
+                logBox.value = await logReq.text();
+            } catch (error) {
+                console.error("Error fetching logs:", error);
+                logBox.value = "Failed to load logs.";
+            }
+        }
+        // 2. Function to fetch logs
+        async function fetchNotifyUsers() {
+            try {
+                const logReq = await fetch(`${BASE_URL}/notify_sub`);
+                if (!logReq.ok) throw new Error(`Log Error: ${logReq.status}`);
+                nInfoBox.value = await logReq.text();
+            } catch (error) {
+                console.error("Error fetching logs:", error);
+                nInfoBox.value = "Failed to load logs.";
+            }
+        }
+
+        // 3. Initialize default values on page load
+        function initDefaults() {
+            // Get today's local date in YYYY-MM-DD format
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+
+            dateSelect.value = `${yyyy}-${mm}-${dd}`;
+            locationSelect.value = 'HYDERABAD';
+
+            // Trigger the initial fetch
+            fetchAndDisplayImages();
+        }
+
+        // 4. Event Listeners & Bootstrapping
+        dateSelect.addEventListener('change', fetchAndDisplayImages);
+        locationSelect.addEventListener('change', fetchAndDisplayImages);
+
+        initDefaults();
+        fetchLogs();
+        fetchNotifyUsers();
+    </script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Data & Log Viewer</title>
+</head>
+<body>
+
+    <div>
+        <label for="dateSelect">Date:</label>
+        <input type="date" id="dateSelect">
+
+        <label for="locationSelect">Location:</label>
+        <select id="locationSelect">
+            <option value="">--Select--</option>
+            <option value="HYDERABAD">Hyderabad</option>
+            <option value="BANGALORE">Bangalore</option>
+        </select>
+    </div>
+
+    <hr>
+
+    <div id="imageList">
+        <!-- Images will be injected here -->
+    </div>
+
+    <hr>
+
+    <div>
+        <h3>System Logs</h3>
+        <!-- Textarea is great for displaying raw text files -->
+        <textarea id="logBox" rows="15" cols="80" readonly>Loading logs...</textarea>
+    </div>
+
+    <script>
+        // Replace this with your actual backend URL
+        const BASE_URL = 'http://localhost:8000'; 
+
+        const dateSelect = document.getElementById('dateSelect');
+        const locationSelect = document.getElementById('locationSelect');
+        const imageList = document.getElementById('imageList');
+        const logBox = document.getElementById('logBox');
+
+        // 1. Function to handle image fetching
+        async function fetchAndDisplayImages() {
+            const date = dateSelect.value;
+            const location = locationSelect.value;
+
+            // Only proceed if both fields are selected
+            if (!date || !location) return;
+
+            imageList.innerHTML = '<p>Loading data...</p>';
+
+            try {
+                // Fetch the array of filenames
+                const infoReq = await fetch(`${BASE_URL}/api/info/${date}/${location}/`);
+                if (!infoReq.ok) throw new Error(`API Error: ${infoReq.status}`);
+                
+                const files = await infoReq.json();
+                imageList.innerHTML = ''; // Clear loading text
+
+                if (files.length === 0) {
+                    imageList.innerHTML = '<p>No images found for this date/location.</p>';
+                    return;
+                }
+
+                console.log(files)
+
+                // Iterate through the array and build the DOM elements
+                files.forEach(fileName => {
+                    // Extract time from "08-46-38.png" -> "08:46:38"
+                    const timeString = fileName.replace('.png', '').replace(/-/g, ':');
+                    
+                    // Construct the image URL (Note: Added the trailing slash exactly as requested)
+                    const imgUrl = `${BASE_URL}/fs/${date}/${location}/${fileName}/`;
+
+                    // Create a container for each record
+                    const container = document.createElement('div');
+                    container.innerHTML = `
+                        <p><strong>Date:</strong> ${date} | <strong>Time:</strong> ${timeString}</p>
+                        <img src="${imgUrl}" alt="Image from ${timeString}" style="max-width: 400px; display: block; margin-bottom: 20px;">
+                    `;
+                    
+                    imageList.appendChild(container);
+                });
+
+            } catch (error) {
+                console.error("Error fetching images:", error);
+                imageList.innerHTML = `<p style="color: red;">Failed to load images. Check console.</p>`;
+            }
+        }
+
+        // 2. Function to fetch logs on page load
+        async function fetchLogs() {
+            try {
+                const logReq = await fetch(`${BASE_URL}/logs`);
+                if (!logReq.ok) throw new Error(`Log Error: ${logReq.status}`);
+                
+                const logText = await logReq.text();
+                logBox.value = logText;
+            } catch (error) {
+                console.error("Error fetching logs:", error);
+                logBox.value = "Failed to load logs.";
+            }
+        }
+
+        // 3. Event Listeners
+        dateSelect.addEventListener('change', fetchAndDisplayImages);
+        locationSelect.addEventListener('change', fetchAndDisplayImages);
+
+        // Fetch logs immediately when the script runs
+        fetchLogs();
+    </script>
+</body>
+</html>
