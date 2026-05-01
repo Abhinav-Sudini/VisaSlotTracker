@@ -46,7 +46,8 @@
     </div>
 
     <script>
-        const BASE_URL = 'http://localhost:8000'; 
+        // const BASE_URL = 'http://localhost:8000'; 
+        const BASE_URL = 'https://abhi.dedyn.io/visaTracker'; 
 
         const dateSelect = document.getElementById('dateSelect');
         const locationSelect = document.getElementById('locationSelect');
@@ -112,7 +113,7 @@
         // 2. Function to fetch logs
         async function fetchLogs() {
             try {
-                const logReq = await fetch(`${BASE_URL}/logs`);
+                const logReq = await fetch(`${BASE_URL}/logs/`);
                 if (!logReq.ok) throw new Error(`Log Error: ${logReq.status}`);
                 logBox.value = await logReq.text();
             } catch (error) {
@@ -123,7 +124,7 @@
         // 2. Function to fetch logs
         async function fetchNotifyUsers() {
             try {
-                const logReq = await fetch(`${BASE_URL}/notify_sub`);
+                const logReq = await fetch(`${BASE_URL}/notify_sub/`);
                 if (!logReq.ok) throw new Error(`Log Error: ${logReq.status}`);
                 nInfoBox.value = await logReq.text();
             } catch (error) {

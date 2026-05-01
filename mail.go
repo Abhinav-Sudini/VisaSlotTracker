@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"log"
 	"net/smtp"
+	"os"
 )
 
 func SendMail(To string, avl_slots int, loc string) {
 	from := "sudiniabhinav@gmail.com"
-	appPassword := "aijr arga jqxx udhl"
+	appPassword := os.Getenv("EMAIL_PASS")
 
 	// to := []string{"abhinavsai5205418@gmail.com"}
 	to := []string{To}
