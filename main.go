@@ -18,19 +18,37 @@ var n_list = []notify_info{
 		notify_type: "mail",
 		mail: "sudiniabhinav@gmail.com",
 		visa_location: "HYDERABAD",
-		min_slots_required: 1,
+		min_slots_required: 2,
 	},
 	{
 		notify_type: "mail",
 		mail: "sudiniabhinav@gmail.com",
 		visa_location: "HYDERABAD VAC",
-		min_slots_required: 1,
+		min_slots_required: 2,
+	},
+	{
+		notify_type: "mail",
+		mail: "akshithasudini@gmail.com",
+		visa_location: "HYDERABAD",
+		min_slots_required: 4,
+	},
+	{
+		notify_type: "mail",
+		mail: "akshithasudini@gmail.com",
+		visa_location: "HYDERABAD VAC",
+		min_slots_required: 4,
 	},
 	{
 		notify_type: "mail",
 		mail: "sudiniabhinav@gmail.com",
 		visa_location: "*",
 		min_slots_required: 4,
+	},
+	{
+		notify_type: "mail",
+		mail: "akshithasudini@gmail.com",
+		visa_location: "*",
+		min_slots_required: 6,
 	},
 }
 
