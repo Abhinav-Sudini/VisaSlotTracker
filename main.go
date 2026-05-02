@@ -87,7 +87,6 @@ func main() {
 	log.SetOutput(file)
 	// log.SetOutput(os.Stdout)
 
-	fmt.Println(GetMaxTries())
 	go restart_cron_jobs_everyday()
 	go start_cron_job(config.ticker_time)
 	Start_server()
