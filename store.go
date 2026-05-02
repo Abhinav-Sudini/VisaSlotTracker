@@ -17,11 +17,16 @@ func SaveSlotsAndNotifyUsers() error {
 		log.Println("failed to get slots with err = ", err)
 		return err
 	}
+	if len(slots)==0 {
+		config.ticker_time = config.ticker_time*2
+		restartCron(config.ticker_time)
+	}
 	saveSlots(slots)
 
 	NotifyUsers(slots)
 	return nil
 }
+
 
 func NotifyUsers(slots []Slot) {
 	for _,n_info := range(config.notify_list){
@@ -32,7 +37,7 @@ func NotifyUsers(slots []Slot) {
 			if slot.Slots >= n_info.min_slots_required {
 				log.Println("")
 				log.Println("Sending mail to - ",n_info.mail)
-				SendMail(n_info.mail,slot.Slots,n_info.visa_location)
+				SendMail(n_info.mail,slot.Slots,slot.VisaLocation)
 			}
 		}
 	}

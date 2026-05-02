@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -61,7 +60,18 @@ func ticTimeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	config.ticker_time = v
-	cron_stop_chan<-true
-	log.Println("restarting cron handler with int - ",v)
-	go start_cron_job(config.ticker_time)
+	restartCron(config.ticker_time)
+}
+
+func ticCntHandler(w http.ResponseWriter, r *http.Request) {
+	new_time := r.PathValue("new_time")
+	v,err := strconv.Atoi(new_time)
+	if new_time == "" || err != nil{
+		http.Error(w,"no mail given",http.StatusBadRequest)
+		return
+	}
+	config.max_tries = v
+	config.ticker_time = (24*60*60)/v
+	w.Write([]byte(fmt.Sprintf("restarting cron with tries %v  and time %v \n",config.max_tries,config.ticker_time)))
+	restartCron(config.ticker_time)
 }
