@@ -52,19 +52,13 @@ var n_list = []notify_info{
 		notify_type:        "mail",
 		mail:               "abhinav_2301cs03@iitp.ac.in",
 		visa_location:      "*",
-		min_slots_required: 4,
+		min_slots_required: 10,
 	},
 	{
 		notify_type:        "mail",
 		mail:               "sudiniabhinav@gmail.com",
 		visa_location:      "*",
-		min_slots_required: 4,
-	},
-	{
-		notify_type:        "mail",
-		mail:               "akshithasudini@gmail.com",
-		visa_location:      "*",
-		min_slots_required: 6,
+		min_slots_required: 10,
 	},
 }
 
