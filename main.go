@@ -16,48 +16,56 @@ var n_list = []notify_info{
 		notify_type:        "mail",
 		mail:               "sudiniabhinav@gmail.com",
 		visa_location:      "HYDERABAD",
+		valid: true,
 		min_slots_required: 2,
 	},
 	{
 		notify_type:        "mail",
 		mail:               "sudiniabhinav@gmail.com",
 		visa_location:      "HYDERABAD VAC",
+		valid: true,
 		min_slots_required: 2,
 	},
 	{
 		notify_type:        "mail",
 		mail:               "akshithasudini@gmail.com",
 		visa_location:      "HYDERABAD",
+		valid: true,
 		min_slots_required: 4,
 	},
 	{
 		notify_type:        "mail",
 		mail:               "akshithasudini@gmail.com",
 		visa_location:      "HYDERABAD VAC",
+		valid: true,
 		min_slots_required: 4,
 	},
 	{
 		notify_type:        "mail",
 		mail:               "abhinav_2301cs03@iitp.ac.in",
 		visa_location:      "HYDERABAD",
+		valid: true,
 		min_slots_required: 2,
 	},
 	{
 		notify_type:        "mail",
 		mail:               "abhinav_2301cs03@iitp.ac.in",
 		visa_location:      "HYDERABAD VAC",
+		valid: true,
 		min_slots_required: 2,
 	},
 	{
 		notify_type:        "mail",
 		mail:               "abhinav_2301cs03@iitp.ac.in",
 		visa_location:      "*",
+		valid: true,
 		min_slots_required: 10,
 	},
 	{
 		notify_type:        "mail",
 		mail:               "sudiniabhinav@gmail.com",
 		visa_location:      "*",
+		valid: true,
 		min_slots_required: 10,
 	},
 }
@@ -81,6 +89,7 @@ func Start_server() {
 	http.HandleFunc("/api/info/{day}/{visa_loc}/", infoHandler)
 	http.HandleFunc("/api/update_tic_time/{new_time}/", ticTimeHandler)
 	http.HandleFunc("/api/update_tic_cnt/{new_time}/", ticCntHandler)
+	http.HandleFunc("/api/togle_notify/{n_id}/", toggle_valid_users)
 
 	fshandler := http.FileServer(http.Dir(config.FS_root))
 	http.Handle("/fs/", http.StripPrefix("/fs/", fshandler))

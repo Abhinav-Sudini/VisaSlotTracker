@@ -10,15 +10,14 @@ import (
 	"time"
 )
 
-
 func SaveSlotsAndNotifyUsers() error {
 	slots, err := getSlotsjson()
 	if err != nil {
 		log.Println("failed to get slots with err = ", err)
 		return err
 	}
-	if len(slots)==0 {
-		config.ticker_time = config.ticker_time*2
+	if len(slots) == 0 {
+		config.ticker_time = config.ticker_time * 2
 		restartCron(config.ticker_time)
 	}
 	saveSlots(slots)
@@ -27,22 +26,20 @@ func SaveSlotsAndNotifyUsers() error {
 	return nil
 }
 
-
 func NotifyUsers(slots []Slot) {
-	for _,n_info := range(config.notify_list){
-		for _,slot := range(slots){
-			if n_info.visa_location!="*" && !strings.EqualFold(slot.VisaLocation,n_info.visa_location){
+	for _, n_info := range config.notify_list {
+		for _, slot := range slots {
+			if n_info.visa_location != "*" && !strings.EqualFold(slot.VisaLocation, n_info.visa_location) {
 				continue
 			}
-			if slot.Slots >= n_info.min_slots_required {
+			if slot.Slots >= n_info.min_slots_required && n_info.valid == true {
 				log.Println("")
-				log.Println("Sending mail to - ",n_info.mail)
-				SendMail(n_info.mail,slot.Slots,slot.VisaLocation)
+				log.Println("Sending mail to - ", n_info.mail)
+				SendMail(n_info.mail, slot.Slots, slot.VisaLocation)
 			}
 		}
 	}
 }
-
 
 func saveSlots(slots []Slot) {
 	saveSlot := func(slot Slot, wg *sync.WaitGroup) error {
@@ -57,7 +54,6 @@ func saveSlots(slots []Slot) {
 
 		// Create date dir (YYYY-MM-DD)
 		dateDir := t.Format("2006-01-02")
-
 
 		// Clean visa location (avoid spaces issues)
 		locDir := strings.ReplaceAll(slot.VisaLocation, " ", "_")
@@ -91,9 +87,8 @@ func saveSlots(slots []Slot) {
 		wg.Add(1)
 		err := saveSlot(slot, &wg)
 		if err != nil {
-			fmt.Println("err in download ",err)
+			fmt.Println("err in download ", err)
 		}
 	}
 	wg.Wait()
 }
-

@@ -1,13 +1,13 @@
 package main
 
 type config_struct struct {
-	max_tries      int
-	ticker_time    int
-	notify_list    []notify_info
-	FS_root        string
-	ServerAddr     string
-	log_file       string
-	Api_key string
+	max_tries   int
+	ticker_time int
+	notify_list []notify_info
+	FS_root     string
+	ServerAddr  string
+	log_file    string
+	Api_key     string
 }
 
 type notify_info struct {
@@ -15,6 +15,7 @@ type notify_info struct {
 	mail               string
 	visa_location      string
 	min_slots_required int
+	valid              bool
 }
 
 type Slot struct {

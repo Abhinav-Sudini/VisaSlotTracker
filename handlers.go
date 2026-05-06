@@ -32,15 +32,15 @@ func getNotifyUsersHandler(w http.ResponseWriter, r *http.Request) {
 	out := ""
 	for _, n_info := range config.notify_list {
 		out += fmt.Sprintf(
-			"action=notify mail_to= %s || min_open_slots_required_to_trigger= %v || visa_location=%s ",
+			"action=notify mail_to= %s || min_open_slots_required_to_trigger= %v || visa_location=%s || valid %v \n",
 			n_info.mail,
 			n_info.min_slots_required,
 			n_info.visa_location,
+			n_info.valid,
 		)
-		out += "\n"
 	}
 	w.Write([]byte(out))
-	w.Write([]byte(fmt.Sprintf("ticker time = %v",config.ticker_time)))
+	fmt.Fprintf(w,"ticker time = %v",config.ticker_time)
 }
 
 func testNotifyHandler(w http.ResponseWriter, r *http.Request) {
@@ -72,6 +72,17 @@ func ticCntHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	config.max_tries = v
 	config.ticker_time = (24*60*60)/v
-	w.Write([]byte(fmt.Sprintf("restarting cron with tries %v  and time %v \n",config.max_tries,config.ticker_time)))
+	fmt.Fprintf(w,"restarting cron with tries %v  and time %v \n",config.max_tries,config.ticker_time)
 	restartCron(config.ticker_time)
+}
+
+func toggle_valid_users(w http.ResponseWriter, r *http.Request) {
+	n_id := r.PathValue("n_id")
+	id,err := strconv.Atoi(n_id)
+	if n_id == "" || err != nil || id > len(n_list){
+		http.Error(w,"not valid id given",http.StatusBadRequest)
+		return
+	}
+	n_list[id].valid = toggle(n_list[id].valid)
+	fmt.Fprintf(w,"toggle %v  \n",n_list[id])
 }

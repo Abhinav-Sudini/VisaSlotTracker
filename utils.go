@@ -74,3 +74,10 @@ func GetFilesAsJSON(dirPath string) (string, error) {
 
 	return string(jsonData), nil
 }
+
+func toggle(b bool) bool {
+	if b {
+		return false
+	}
+	return true
+}
