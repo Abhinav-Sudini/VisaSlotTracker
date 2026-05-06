@@ -30,6 +30,7 @@ func restart_cron_jobs_everyday() {
 		select {
 		case _ = <-ticker:
 			removeOldData()
+			reset_notify()
 			restartCron((24 * 60 * 60) / 20)
 			log.Println("[INFO] restarting cron to 20")
 			log.Println("")
@@ -37,6 +38,12 @@ func restart_cron_jobs_everyday() {
 			log.Println("cron job handler stoped")
 			return
 		}
+	}
+}
+
+func reset_notify(){
+	for i := range n_list{
+		n_list[i].valid = true
 	}
 }
 
